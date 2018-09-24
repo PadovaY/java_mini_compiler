@@ -1,7 +1,3 @@
-yoavabadi
-yuval.p
-
-
 
 =============================
 =      File description     =
@@ -38,7 +34,6 @@ yuval.p
     ├── StringVariable.java                     - A class represents a String Variable.
     ├── VariableFactory.java                    - A class represents a Variable Factory.
     └── Variable.java                           - A class represents a Variable.
-- README                                        -  This file.
 
 
 =============================
@@ -46,11 +41,12 @@ yuval.p
 =============================
 
 
-As we have described graphically in the UML, our design is based on a few design principles and patterns:
+As described graphically in the UML, the design is based on a few design principles and patterns:
 
-    modularity - by dividing our project to as much small, independent components,
-    we assured the project will be as modular as possible.
-    At first, we divided our code to three independent packages:
+    modularity - by dividing the project to much small, independent components,
+    it's assured the project will be as modular as possible.
+    
+    this was accomplished by dividing the code to three independent packages:
         1.  main - this package contains the necessary classes for going through (parse) a sjavac code
             file, where each case is handled differently, according to the sjavac language syntax.
 
@@ -61,167 +57,37 @@ As we have described graphically in the UML, our design is based on a few design
            including int, double, char, boolean and string variables.
 
     By creating packages for scopes and variables, together with the factories and the abstraction,
-    that will be discuss in a bit, we made it very easy to create more and more scopes and variable types,
+    that will be discuss in a bit, it is very easy to create more and more scopes and variable types,
     or change an existing one - and this is what modularity is all about.
 
-    Encapsulation - by signing our sensitive data members as private, or packaged-accessed,
-    we, in matter of effect, implemented an access prevention policy for our code, so it may not
+    Encapsulation - by signing sensitive data members as private, or packaged-accessed,
+    in matter of effect,  an access prevention policy for our code was generated, so it may not
     be used for malicious purposes.
 
     Factories - by creating a Factory class for each of the modular packages - Scope's Method and Variable,
-    we had been able to create our needed classes' instances much easier, and, of course, don't expose
+    it enables to create needed classes' instances much easier, and, of course, don't expose
     our independent classes' code to the public.
 
     Abstraction - by creating an interface for the scope and variable packages, and then divide the different
-    classes to inherit from a common properties' abstract classes, we farther and farther increased the
-    level of abstraction of our code, and therefore gain a much easier access to our otherwise complex
+    classes to inherit from a common properties' abstract classes, the abstraction of the code was farther and farther
+    increased, and therefore gain a much easier access to the otherwise complex
     program's operations, and create a more simple, modular program.
-
-    NOTE: we DID want to implement the GlobalScope as a Singleton, BUT, because of the way the testing has
-    been done (batch test the files, without initialization, we couldn't use this useful design pattern.
-
-
-=============================
-=  Implementation details   =
-=============================
-
-We implemented our design by creating three different packages (SEE ABOVE for more information),
-where for each of the Scope and Variable packages, we  created an abstract Scope and Variable classes,
-
-and in the Scope package, we created additional three abstract classes: ConditionalScope, for the
-scopes that has a condition statement - like loops and conditions; Loop, for the scopes related to
-iterations; Method, for the scopes related to method types (in this exercise only void method is
-supported, SEE ANSWER for more information about further possible extensions).
-
-
-THINKING PROCESS:
-
-As we said above, we do know the global scope needs to be a single instance, meaning it needs to be a
-Singleton, but in batch tests that never initializes the global scope's instance, so instead of having
-a single global instance for each file, we have a single instance for ALL of the files - so we aborted
-this idea.
-
-ERROR HANDLING and EXCEPTIONS
-We implemented a vast amount of exceptions, were there are two main types:
-    (a) a code syntax error - for those, we printed an informative error message, and return 1,
-        as we been asked.
-    (b) an I/O Error - meaning, our program didn't even parsed the code file, and so we return 2,
-        as we been asked.
-
-For further information, please see questions the BELOW answers.
-
-=============================
-=    Answers to questions   =
-=============================
-
-1.  QUESTION: How would you modify your code to add new types of variables (e.g., float)?
-    ANSWER: The fact we made our code so modular has a great advantage here - because Variable
-    is an abstract class, we can just extends it to a float variable class - FloatVariable.
-
-2.  QUESTION:
-    Below are four features your program currently does not support. Please select two of
-    them, and describe which modifications/extensions you would have to make in your code
-    in order to support them. Please briefly describe which classes you would add to your code,
-    which methods you would add to existing classes, and which classes you would modify. You
-    are not required to implement these features.
-    - Classes
-    – Different methods’ types (i.e int foo()).
-    – Using methods of standard java (i.e System.out.println).
-    – Inheritances of files (just like class inheritage, so virtual functions can appear, and a
-      sub-file may use a method from a parent file).
-    ANSWER:
-    (a) Classes: we would extend the abstract Scope class for a new "Class" class, which will be
-        an abstract class. We will make Class extends Scope, because the class objects we have a
-        lot of similar features with the Scope abstract class (the brackets, declarations,
-        scopeVariables, scopeMethods etc.), and a class is a scope type. We will make it abstract
-        as well, because there are a lot of different kinds of classes - interface, abstract,
-        we need to think about modifiers handling, and so on. As we will implement the Class class,
-        the instance initialization validation comes to mind -  we will need to check in the parser
-        the instance initialization as well as the class declaration - this entails checking that if
-        a class is initialized, the class has a valid constructor (or more then one), which needs to
-        be added as a special "method" extensions, and so on.
-        Changes - we will need to make a new method that checks the instance initialization and the
-        Class scope, it shouldn't take more then two methods and calls.
-        EXCEPTIONS - We will also need exceptions for invalid classes types, modifiers and initialization.
-
-
-    (b) Different methods’ types: This will be the easiest of them all - because we chose to make an
-        Method abstract class, we can just extends this class to support all different types of
-        methods: int, double, String, etc. of course, if we will want to implement a return statement
-        check for each one of them, and so on, and check exceptions regarding invalid method types.
-        we wouldn't need to change our parser - the parser is checking for a method and method call,
-        without a special case for void method, by extending the supported method types in the MethodFactory.
-        We might be needing an unsupported method type exception.
-        Also, we'll be needing a change in the way the parser go through the return statement, were it needs
-        to check if the currentScope get the right type of variable, elsw we'll need to throw an exception.
-
-    (c) Inheritances of files: We will need to change the parser class so, for every encounter with a reserved
-        word "import", we will recursively go through the path specified, and parse the files in that path,
-        with the parser (meaning, we'll create methods and variable instances for each file, and link those
-        to our globalScope, if the access modifiers allows it).
-        We will need to mange a new I/O exceptions, of a imported directory doesn't exist, and exceptions
-        for "This method not exists in this imported file".
-        We'll also need to decide if we will return an error if the imported file has an I/O or syntax error.
-
-3.  REGULAR EXPRESSIONS: In each regex, we allowed spaces by adding "\s*" between each element,
-    and allowed optional declarations and conditional declarations, by adding "?" and "|" respectively.
-    Our two main regular expressions, that we use throughout this program, are:
-    (a) Variable statement validation :
-        ^((\s*(final)\s+)?\s*(int|String|double|char|boolean)\s+)?([a-zA-Z]+\w*|[_]+\w+)(\s*=\s*((\".*\")|
-        (\'[\\x00-\\x7F]\')|(true|false)|(-?[0-9]+\.[0-9]+)|(-?[0-9]+)|([a-zA-Z]+\w*|[_]+\w+)))?\s*(;)\s*$
-        Explanation:
-        Let's break this regex into small groups:
-        (1) final check -  (\s*(final)\s+)? :
-            This regex group checks if a final modifier has been declared,
-            where we can extend this group to check for other modifiers - static for example.
-            The ? sign makes this whole group optional - meaning, we don't have to declare this group to
-            get a valid regex match.
-        (2) Variable type declaration - \s*(int|String|double|char|boolean)\s+)? :
-            This regex group checks if a the variable's type has been declared,
-            where we can extend this group to check for other types - float for example.
-            The ? sign makes this whole group optional - meaning, we don't have to declare this group to
-            get a valid regex match.
-        (3) Variable name - ([a-zA-Z]+\w*|[_]+\w+) :
-              This regex group checks if a the variable's name has been declared.
-        (4) Variable value - The below regex, with a "|" or operator between them :
-            (\".*\") : This group matches a valid string variable.
-            (\'[\\x00-\\x7F]\') : This group matches a valid char variable.
-            (true|false) : This group matches a valid boolean variable.
-            (-?[0-9]+\.[0-9]+) : This group matches a valid double variable.
-            (-?[0-9]+) : This group matches a valid int variable.
-            ([a-zA-Z]+\w*|[_]+\w+) : This group matches a (maybe) already declared variable name.
-
-    (b) Scope declaration statement validation:
-        ^\s*((while)|(if))\s*\((.*)\)\s*\{|\s*(void)\s+([a-zA-Z]\w*)\s*\((.*)\)\s*\{\s*$
-        Explanation:
-        Let's break this regex into small groups:
-        (1) Conditions -  \s*((while)|(if))\s*\((.*)\)\s*\{ :
-            This regex group checks if a condition scope has been declared, including the conditional
-            statement, which we checked with another regex:
-            (\s*((true|false)|([a-zA-Z]+\w*|[_]+\w+)|(-?[0-9]+\.[0-9]+)|(-?[0-9]+))\s*),
-            that is similar to the variable value's check.
-        (2) Method - \s*(void)\s+([a-zA-Z]\w*)\s*\((.*)\)\s*\{\s* :
-            This regex group checks if a Method scope has been declared,  including the parameters,
-            which which we checked with a another regex:
-            (".*")|('[\x00-\x7F]')|(true|false)|-?([0-9]+)|-?([0-9]+\.[0-9]+), that is similar to
-            the variable value's check.
-            where we can extend this group to check for other Method types - int type for example.
 
 
 ---------------------------------------------------------------------------------------------------
 UML Changes:
 ---------------------------------------------------------------------------------------------------
 A good programmer design his or her program before implementing it, but no design is perfect, so...
-We made some changes in the design, mainly:
+there are some changes in the design, mainly:
 
 (*) Not implemented:
     - Variable Package have been fully implemented
-    - main Package: we decided that the exceptions don't contribute so we passed on them
-    - Scope package: we didn't implemented: Comments, SingleComment, Or, And, ConditionsFactory,
-      Modifier, Final classes and some of the exceptions we didn't need.
+    - main Package: the exceptions don't contribute so they were not implemnted
+    - Scope package: didn't implemented: Comments, SingleComment, Or, And, ConditionsFactory,
+      Modifier, Final classes and some of the exceptions didn't need.
 
-     this is because we found much useful way to deal with parsing. thanks to regex we could
-     easily derive the statements we wanted, and because we checked only static codes and not
+     this is because there is a much useful way to deal with parsing. thanks to regex it is 
+     easy to derive the statements wanted, and because there are only static codes and not
      flow it was more than enough.
 
      as uncle ben said: with great power, comes big responsibility.
